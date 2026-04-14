@@ -10,12 +10,43 @@ export default function UploadPage() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [filesConsumed, setFilesConsumed] = useState(0);
+  const [chewFrame, setChewFrame] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chewIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const count = parseInt(localStorage.getItem('ps-files-consumed') || '0');
     setFilesConsumed(count);
   }, []);
+
+  // Chomping animation: cycle through frames while chewing
+  useEffect(() => {
+    if (isChewing) {
+      chewIntervalRef.current = setInterval(() => {
+        setChewFrame(f => (f + 1) % 4);
+      }, 200);
+    } else {
+      if (chewIntervalRef.current) clearInterval(chewIntervalRef.current);
+      setChewFrame(0);
+    }
+    return () => { if (chewIntervalRef.current) clearInterval(chewIntervalRef.current); };
+  }, [isChewing]);
+
+  // Remember slugs per filename so re-uploading the same file creates v2, v3, etc.
+  const getSlugForFile = (filename: string): string | undefined => {
+    try {
+      const map = JSON.parse(localStorage.getItem('ps-file-slugs') || '{}');
+      return map[filename];
+    } catch { return undefined; }
+  };
+
+  const saveSlugForFile = (filename: string, slug: string) => {
+    try {
+      const map = JSON.parse(localStorage.getItem('ps-file-slugs') || '{}');
+      map[filename] = slug;
+      localStorage.setItem('ps-file-slugs', JSON.stringify(map));
+    } catch { /* ignore */ }
+  };
 
   const handleFile = useCallback(async (file: File) => {
     if (!file.name.endsWith('.html') && !file.name.endsWith('.htm')) {
@@ -43,10 +74,13 @@ export default function UploadPage() {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
 
+      // Check if we've uploaded this filename before (creates v2, v3, etc.)
+      const existingSlug = getSlugForFile(file.name);
+
       const res = await fetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html, hash }),
+        body: JSON.stringify({ html, hash, slug: existingSlug }),
       });
 
       const body = await res.json();
@@ -58,7 +92,10 @@ export default function UploadPage() {
         return;
       }
 
-      // Chewing animation for 1.5s
+      // Remember this filename -> slug mapping
+      saveSlugForFile(file.name, body.slug);
+
+      // Keep chomping for at least 1.5s so the animation is visible
       await new Promise(r => setTimeout(r, 1500));
 
       const newCount = filesConsumed + 1;
@@ -147,12 +184,14 @@ export default function UploadPage() {
 
               {/* Eyes */}
               <div className="ps-eyes">
-                <div className={`ps-eye ps-eye-left ${isDragging ? 'ps-eye-wide' : ''} ${isChewing ? 'ps-eye-happy' : ''}`}>
+                <div className={`ps-eye ps-eye-left ${isDragging ? 'ps-eye-wide' : ''} ${isChewing ? 'ps-eye-chomp' : ''}`}
+                  style={isChewing ? { transform: `scaleY(${chewFrame % 2 === 0 ? 0.7 : 1})` } : undefined}>
                   <div className="ps-pupil" /><div className="ps-pupil" />
                   <div className="ps-pupil" /><div className="ps-pupil" />
                 </div>
-                <div className="ps-eye-divider">{isChewing ? '~' : '\u2014'}</div>
-                <div className={`ps-eye ps-eye-right ${isDragging ? 'ps-eye-wide' : ''} ${isChewing ? 'ps-eye-happy' : ''}`}>
+                <div className="ps-eye-divider">{isChewing ? ['~', '^', '~', 'v'][chewFrame] : '\u2014'}</div>
+                <div className={`ps-eye ps-eye-right ${isDragging ? 'ps-eye-wide' : ''} ${isChewing ? 'ps-eye-chomp' : ''}`}
+                  style={isChewing ? { transform: `scaleY(${chewFrame % 2 === 0 ? 0.7 : 1})` } : undefined}>
                   <div className="ps-pupil" /><div className="ps-pupil" />
                   <div className="ps-pupil" /><div className="ps-pupil" />
                 </div>
@@ -160,17 +199,23 @@ export default function UploadPage() {
 
               {/* Side lights */}
               <div className="ps-side-lights ps-side-left">
-                <div className={`ps-side-light ${isDragging ? 'ps-light-on' : ''}`} />
-                <div className={`ps-side-light ${isDragging ? 'ps-light-on ps-light-delay' : ''}`} />
+                <div className={`ps-side-light ${isDragging || isChewing ? 'ps-light-on' : ''}`} />
+                <div className={`ps-side-light ${isDragging || isChewing ? 'ps-light-on ps-light-delay' : ''}`} />
               </div>
               <div className="ps-side-lights ps-side-right">
-                <div className={`ps-side-light ${isDragging ? 'ps-light-on' : ''}`} />
-                <div className={`ps-side-light ${isDragging ? 'ps-light-on ps-light-delay' : ''}`} />
+                <div className={`ps-side-light ${isDragging || isChewing ? 'ps-light-on' : ''}`} />
+                <div className={`ps-side-light ${isDragging || isChewing ? 'ps-light-on ps-light-delay' : ''}`} />
               </div>
 
               {/* Mouth (drop zone) */}
-              <div className={`ps-mouth ${isDragging ? 'ps-mouth-open' : ''} ${isChewing ? 'ps-mouth-chewing' : ''}`}>
-                {isUploading ? (
+              <div className={`ps-mouth ${isDragging ? 'ps-mouth-open' : ''} ${isChewing ? 'ps-mouth-chewing' : ''}`}
+                style={isChewing ? { paddingTop: chewFrame % 2 === 0 ? 12 : 24, paddingBottom: chewFrame % 2 === 0 ? 24 : 12 } : undefined}
+              >
+                {isChewing ? (
+                  <div className="ps-mouth-text" style={{ color: '#f97316' }}>
+                    {['NOM', 'CHOMP', 'MUNCH', 'CRUNCH'][chewFrame]}
+                  </div>
+                ) : isUploading ? (
                   <div className="ps-mouth-text">PROCESSING...</div>
                 ) : isDragging ? (
                   <div className="ps-mouth-text ps-mouth-ready">FEED ME</div>
@@ -181,10 +226,10 @@ export default function UploadPage() {
                   </>
                 )}
                 {/* Teeth */}
-                <div className="ps-teeth ps-teeth-top">
+                <div className="ps-teeth ps-teeth-top" style={isChewing ? { transform: `translateY(${chewFrame % 2 === 0 ? 4 : 0}px)` } : undefined}>
                   {[...Array(7)].map((_, i) => <div key={i} className="ps-tooth" />)}
                 </div>
-                <div className="ps-teeth ps-teeth-bottom">
+                <div className="ps-teeth ps-teeth-bottom" style={isChewing ? { transform: `translateY(${chewFrame % 2 === 0 ? -4 : 0}px)` } : undefined}>
                   {[...Array(7)].map((_, i) => <div key={i} className="ps-tooth" />)}
                 </div>
               </div>
@@ -431,6 +476,12 @@ export default function UploadPage() {
           box-shadow: 0 0 12px rgba(74, 222, 128, 0.3);
           border-color: #4ade80;
         }
+        .ps-eye-chomp {
+          box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+          border-color: #f97316;
+          transition: transform 0.15s ease;
+        }
+        .ps-eye-chomp .ps-pupil { background: #f97316; }
         .ps-pupil {
           background: #38bdf8;
           border-radius: 2px;
