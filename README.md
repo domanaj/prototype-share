@@ -1,8 +1,10 @@
-# prototype.share
+# prototype.share 🤖
 
 **Share HTML prototypes with your team. Get feedback with pin comments. Track versions.**
 
 No accounts. No downloads. Just a URL.
+
+**Live:** [prototype-share-olive.vercel.app](https://prototype-share-olive.vercel.app)
 
 ---
 
@@ -12,7 +14,7 @@ When someone on your team builds an HTML prototype (in Claude Code, Cursor, or b
 
 **Before:** Engineer Slacks a `.html` file → PM downloads it → opens locally → types feedback in a Slack thread → nobody knows which version the feedback is about.
 
-**After:** Engineer runs one command → gets a link → PM clicks link → Shift+clicks to pin feedback directly on the prototype → feedback persists across versions.
+**After:** Drop an HTML file on the robot → get a link → PM clicks link → Shift+clicks to pin feedback directly on the prototype → feedback persists across versions.
 
 ---
 
@@ -33,9 +35,19 @@ That's it. Your comments are saved. If the engineer publishes a new version, you
 
 ---
 
-## For engineers (publishing prototypes)
+## For anyone: web upload (no install needed)
 
-### First-time setup (takes 2 minutes)
+Go to **[prototype-share-olive.vercel.app/upload](https://prototype-share-olive.vercel.app/upload)**
+
+Drag and drop an HTML file onto the robot. It chomps your file and gives you a shareable link. Upload the same filename again and it creates v2, v3, etc.
+
+Browse everything your team has shared at the **[HTML Robot Factory](https://prototype-share-olive.vercel.app/gallery)**.
+
+---
+
+## For engineers: CLI
+
+### First-time setup (2 minutes)
 
 ```bash
 git clone https://github.com/domanaj/prototype-share.git
@@ -43,11 +55,6 @@ cd prototype-share/cli
 npm install
 npm run build
 npm link
-```
-
-Then tell the CLI where your team's server is:
-
-```bash
 prototype-share config --set-url https://prototype-share-olive.vercel.app
 ```
 
@@ -71,7 +78,7 @@ Published v1!
   (copied to clipboard)
 ```
 
-Paste that URL in Slack. Done.
+Paste that URL anywhere. Done.
 
 ### Auto-publish on every save
 
@@ -91,7 +98,7 @@ prototype-share list bold-falcon-42
 
 ### Claude Code integration
 
-If you use Claude Code, you can publish with a slash command. Copy the command file into your project:
+If you use Claude Code, you can publish with a slash command:
 
 ```bash
 mkdir -p .claude/commands
@@ -105,21 +112,34 @@ Then type `/share` in Claude Code to publish.
 ## How it works
 
 ```
-  You (engineer)              Server (Vercel)              Reviewer (PM/designer)
-  ──────────────              ───────────────              ─────────────────────
-  prototype-share publish ──→ Bundles HTML into            Opens URL in browser
-                              one file, stores it    ──→   Sees the prototype
-                              Returns a URL                Shift+clicks to comment
-                                                           Comments saved to server
-  prototype-share publish ──→ Creates v2, keeps v1         Sees v2, old comments
-  (after editing)             Comments carry over          marked if moved
+  You                          Server (Vercel)              Reviewer
+  ───                          ───────────────              ────────
+  Drop HTML on robot      ──→  Stores it, returns URL  ──→  Opens URL
+  (or CLI publish)              Injects comment layer        Shift+clicks to comment
+                                                             Comments saved
+
+  Upload same file again  ──→  Creates v2, keeps v1   ──→   Sees v2, old comments
+                                Comments carry over          marked if element moved
 ```
 
-- **CLI** bundles your HTML + CSS + JS + images into a single file and uploads it.
-- **Server** stores each version. Injects a thin comment layer on top of your prototype when someone views it.
-- **Comments** are pinned to specific spots on the page. If the page changes in a new version, pins try to follow. If they can't, they show an "outdated" badge.
-- **No database.** Everything stored in Vercel Blob (simple file storage).
-- **No accounts.** URLs are unguessable (like Google Docs "anyone with the link" sharing). Reviewers pick a name when they first comment (or stay anonymous).
+- **Web upload** at `/upload` — drag and drop, the robot eats your file
+- **CLI** bundles HTML + CSS + JS + images into one file and uploads it
+- **Server** stores each version in Vercel Blob. Injects a comment layer when viewed.
+- **Comments** are pinned to spots on the page. If the page changes, pins try to follow. If they can't, they show an "outdated" badge.
+- **Gallery** at `/gallery` — browse all prototypes with live previews
+- **No database.** Everything stored in Vercel Blob.
+- **No accounts.** URLs are unguessable. Reviewers stay anonymous or type a name.
+
+---
+
+## Pages
+
+| URL | What it does |
+|-----|-------------|
+| `/upload` | Drag and drop HTML onto the robot to publish |
+| `/gallery` | Browse all prototypes (HTML Robot Factory) |
+| `/p/{slug}` | View a prototype with comment layer |
+| `/p/{slug}/v/{n}` | View a specific version |
 
 ---
 
@@ -129,44 +149,40 @@ Then type `/share` in Claude Code to publish.
 No. They just click the link.
 
 **Q: Does normal clicking still work on the prototype?**
-Yes. Regular clicks work normally (buttons, links, forms all work). Only **Shift+click** drops a comment pin.
+Yes. Regular clicks work normally (buttons, links, forms). Only **Shift+click** drops a comment pin.
 
 **Q: What happens to comments when I publish a new version?**
-They carry over. If the element a comment was pinned to still exists, the pin stays in place. If it moved or was deleted, the pin shows an "outdated" badge.
+They carry over. If the element a comment was pinned to still exists, the pin stays in place. If it was deleted, the pin shows an "outdated" badge.
 
 **Q: Can I use this with React/Vue/Next.js projects?**
-Right now it works with standalone HTML files. If your project uses a framework with a dev server (localhost:3000), export the page as HTML first, then publish that.
+Right now it works with standalone HTML files. If your project uses a dev server, export the page as HTML first.
 
 **Q: Is this only for Claude Code?**
-No. It works with any HTML file, however you made it. Claude Code just happens to produce a lot of `.html` prototypes.
+No. It works with any HTML file. The web upload doesn't require any tools at all.
 
-**Q: How do I point this at a different server?**
-```bash
-prototype-share config --set-url https://your-server.vercel.app
-```
+**Q: How does versioning work?**
+Upload the same filename again (web) or run `prototype-share publish` again (CLI) and it creates v2, v3, etc. Same URL, new version. Reviewers use the dropdown in the top bar to switch versions.
 
 ---
 
-## Deploying your own server
-
-If you want your own instance (recommended for teams):
+## Deploying your own instance
 
 1. Fork this repo
-2. Create a Vercel project from the fork (set root directory to `backend`)
+2. Create a Vercel project (set root directory to `backend`)
 3. Add Blob storage: Project → Storage → Create → Blob
 4. Deploy
 
-The CLI defaults to your Vercel URL once you run `prototype-share config --set-url`.
+Then point the CLI or tell your team to use your URL.
 
 ---
 
 ## Development
 
 ```bash
-# CLI (in one terminal)
+# CLI
 cd cli && npm install && npm run dev
 
-# Backend (in another terminal)
+# Backend
 cd backend && npm install && npm run dev
 ```
 
