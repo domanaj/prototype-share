@@ -260,6 +260,7 @@ export default function UploadPage() {
           {error && <p className="ps-error">{error}</p>}
 
           <div className="ps-quote">{robotQuote()}</div>
+          <a href="/gallery" className="ps-factory-link">HTML Robot Factory →</a>
         </div>
       ) : (
         /* Success state */
@@ -325,6 +326,7 @@ export default function UploadPage() {
           <div className="ps-quote">
             {`"${result.deduplicated ? 'I already ate that one.' : 'Delicious. Your team can Shift+click to leave feedback.'}" \u2014 Robot`}
           </div>
+          <a href="/gallery" className="ps-factory-link">HTML Robot Factory →</a>
         </div>
       )}
 
@@ -731,6 +733,17 @@ export default function UploadPage() {
           25% { transform: rotate(-1deg); }
           75% { transform: rotate(1deg); }
         }
+
+        .ps-factory-link {
+          display: inline-block;
+          margin-top: 16px;
+          color: #333;
+          font-size: 0.7rem;
+          text-decoration: none;
+          letter-spacing: 0.1em;
+          transition: color 0.2s ease;
+        }
+        .ps-factory-link:hover { color: #4ade80; }
 
         @media (prefers-reduced-motion: reduce) {
           .ps-robot, .ps-robot-chewing, .ps-robot-happy,
