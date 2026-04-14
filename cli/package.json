@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "description": "Share HTML prototypes with versioned URLs and pin comments",
   "type": "module",
+  "files": ["dist"],
   "bin": {
-    "prototype-share": "./dist/index.js"
+    "prototype-share": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",

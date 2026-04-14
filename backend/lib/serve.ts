@@ -1,4 +1,4 @@
-import { getMeta, getHtmlUrl } from './store';
+import { getMeta, getHtmlContent } from './store';
 import { getViewerCSS, getViewerJS } from './viewer-bundle';
 
 export async function servePrototype(
@@ -17,10 +17,10 @@ export async function servePrototype(
 
   const version = requestedVersion ?? meta.latestVersion;
 
-  // Fetch HTML from Vercel Blob
-  const htmlUrl = await getHtmlUrl(slug, version);
+  // Fetch HTML from Vercel Blob (private store)
+  let html = await getHtmlContent(slug, version);
 
-  if (!htmlUrl) {
+  if (!html) {
     if (version > 1) {
       return servePrototype(slug, version - 1, request);
     }
@@ -29,9 +29,6 @@ export async function servePrototype(
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
   }
-
-  const res = await fetch(htmlUrl);
-  let html = await res.text();
 
   const apiOrigin = new URL(request.url).origin;
   html = injectViewer(html, slug, version, meta.latestVersion, apiOrigin);

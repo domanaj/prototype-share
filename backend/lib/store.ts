@@ -1,12 +1,6 @@
-import { put, list, head, del } from '@vercel/blob';
+import { put, list, get } from '@vercel/blob';
 
-// Everything is Vercel Blob. No database.
-//
-// Layout:
-//   {slug}/meta.json          - { slug, latestVersion, createdAt }
-//   {slug}/v/{n}/index.html   - the HTML blob
-//   {slug}/v/{n}/info.json    - { version, hash, createdAt }
-//   {slug}/comments.json      - [ { id, version, selector, x, y, body, author, color, createdAt }, ... ]
+// Everything is Vercel Blob (private store). No database.
 
 export interface PrototypeMeta {
   slug: string;
@@ -33,15 +27,34 @@ export interface Comment {
   createdAt: string;
 }
 
-// ─── Read helpers ───
+// ─── Read helper for private blobs ───
+
+async function readBlobText(url: string): Promise<string | null> {
+  const result = await get(url, { access: 'private' });
+  if (!result || result.statusCode !== 200 || !result.stream) return null;
+  const reader = result.stream.getReader();
+  const chunks: Uint8Array[] = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const buf = new Uint8Array(chunks.reduce((acc, c) => acc + c.length, 0));
+  let offset = 0;
+  for (const chunk of chunks) {
+    buf.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return new TextDecoder().decode(buf);
+}
 
 async function readJson<T>(path: string): Promise<T | null> {
   try {
     const { blobs } = await list({ prefix: path, limit: 1 });
     if (!blobs.length) return null;
-    const res = await fetch(blobs[0].url);
-    if (!res.ok) return null;
-    return await res.json() as T;
+    const text = await readBlobText(blobs[0].url);
+    if (!text) return null;
+    return JSON.parse(text) as T;
   } catch {
     return null;
   }
@@ -49,7 +62,7 @@ async function readJson<T>(path: string): Promise<T | null> {
 
 async function writeJson(path: string, data: unknown): Promise<void> {
   await put(path, JSON.stringify(data), {
-    access: 'public',
+    access: 'private',
     contentType: 'application/json',
     addRandomSuffix: false,
   });
@@ -84,14 +97,12 @@ export async function getLatestHash(slug: string, version: number): Promise<stri
 }
 
 export async function createVersion(slug: string, version: number, hash: string, html: string): Promise<void> {
-  // Write HTML blob
   await put(`${slug}/v/${version}/index.html`, html, {
-    access: 'public',
+    access: 'private',
     contentType: 'text/html; charset=utf-8',
     addRandomSuffix: false,
   });
 
-  // Write version info
   const info: VersionInfo = { version, hash, createdAt: new Date().toISOString() };
   await writeJson(`${slug}/v/${version}/info.json`, info);
 }
@@ -103,17 +114,18 @@ export async function listVersions(slug: string): Promise<VersionInfo[]> {
   const versions: VersionInfo[] = [];
   for (const blob of infoBlobs) {
     try {
-      const res = await fetch(blob.url);
-      if (res.ok) versions.push(await res.json() as VersionInfo);
+      const text = await readBlobText(blob.url);
+      if (text) versions.push(JSON.parse(text) as VersionInfo);
     } catch { /* skip */ }
   }
 
   return versions.sort((a, b) => b.version - a.version);
 }
 
-export async function getHtmlUrl(slug: string, version: number): Promise<string | null> {
+export async function getHtmlContent(slug: string, version: number): Promise<string | null> {
   const { blobs } = await list({ prefix: `${slug}/v/${version}/index.html`, limit: 1 });
-  return blobs.length ? blobs[0].url : null;
+  if (!blobs.length) return null;
+  return readBlobText(blobs[0].url);
 }
 
 // ─── Comments ───
