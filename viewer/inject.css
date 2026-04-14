@@ -294,6 +294,77 @@
   color: #ccc;
 }
 
+/* Replies */
+.ps-replies {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.ps-reply {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.ps-reply:last-child {
+  border-bottom: none;
+}
+
+.ps-reply-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.ps-reply-body {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #aaa;
+  padding-left: 14px;
+}
+
+.ps-reply-input-wrap {
+  padding: 8px 12px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ps-reply-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ps-reply-input {
+  flex: 1;
+  min-height: 32px !important;
+  font-size: 12px !important;
+  padding: 6px 8px !important;
+}
+
+.ps-reply-send {
+  width: 32px;
+  height: 32px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.1s ease;
+  font-family: inherit;
+}
+
+.ps-reply-send:hover {
+  background: #5558e6;
+}
+
+.ps-reply-send:active {
+  transform: scale(0.93);
+}
+
 /* New comment input */
 .ps-comment-input-wrap {
   padding: 12px;

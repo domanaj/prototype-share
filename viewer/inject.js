@@ -227,7 +227,7 @@
     setTimeout(() => ripple.remove(), 500);
   }
 
-  // ─── Comment popup ───
+  // ─── Comment popup with replies ───
   function showCommentPopup(comment, pinEl) {
     closePopup();
     const popup = document.createElement('div');
@@ -244,20 +244,96 @@
       if (pr.right > window.innerWidth) {
         popup.style.left = `${rect.left - pr.width - 8}px`;
       }
+      if (pr.bottom > window.innerHeight) {
+        popup.style.top = `${window.scrollY + window.innerHeight - pr.height - 16}px`;
+      }
     });
 
-    const time = new Date(comment.createdAt).toLocaleString(undefined, {
+    const fmtTime = (d) => new Date(d).toLocaleString(undefined, {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
+
+    // Build replies HTML
+    const replies = comment.replies || [];
+    const repliesHtml = replies.map(r => `
+      <div class="ps-reply">
+        <div class="ps-reply-header">
+          <span class="ps-comment-author-dot" style="background:${r.color}"></span>
+          <span class="ps-comment-author-name">${r.author}</span>
+          <span class="ps-comment-time">${fmtTime(r.createdAt)}</span>
+        </div>
+        <div class="ps-reply-body">${r.body}</div>
+      </div>
+    `).join('');
+
+    const identity = getIdentity();
 
     popup.innerHTML = `
       <div class="ps-comment-popup-header">
         <span class="ps-comment-author-dot" style="background:${comment.color}"></span>
         <span class="ps-comment-author-name">${comment.author}</span>
-        <span class="ps-comment-time">${time}</span>
+        <span class="ps-comment-time">${fmtTime(comment.createdAt)}</span>
       </div>
       <div class="ps-comment-body">${comment.body}</div>
+      ${replies.length ? `<div class="ps-replies">${repliesHtml}</div>` : ''}
+      <div class="ps-reply-input-wrap">
+        ${!identity ? '<input class="ps-comment-input" style="min-height:28px;font-size:12px;margin-bottom:6px" placeholder="Your name" data-reply-name>' : ''}
+        <div class="ps-reply-row">
+          <input class="ps-comment-input ps-reply-input" placeholder="Reply..." data-reply-body>
+          <button class="ps-reply-send" data-reply-send>→</button>
+        </div>
+      </div>
     `;
+
+    // Reply submit handler
+    const sendBtn = popup.querySelector('[data-reply-send]');
+    const bodyInput = popup.querySelector('[data-reply-body]');
+    const nameInput = popup.querySelector('[data-reply-name]');
+
+    const submitReply = async () => {
+      const text = bodyInput.value.trim();
+      if (!text) return;
+
+      const authorName = nameInput ? nameInput.value.trim() : (identity?.name || '');
+      const color = identity?.color || randomColor();
+      if (authorName && !identity) setIdentity(authorName, color);
+      else if (!identity) setIdentity('', color);
+
+      sendBtn.textContent = '...';
+      sendBtn.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/reply`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug,
+            commentId: comment.id,
+            body: text,
+            author: authorName || undefined,
+            color,
+          }),
+        });
+
+        if (!res.ok) throw new Error('Failed');
+        const reply = await res.json();
+
+        // Add reply to local comment object
+        if (!comment.replies) comment.replies = [];
+        comment.replies.push(reply);
+
+        // Re-render popup with new reply
+        showCommentPopup(comment, pinEl);
+      } catch {
+        sendBtn.textContent = '!';
+        setTimeout(() => { sendBtn.textContent = '→'; sendBtn.disabled = false; }, 1000);
+      }
+    };
+
+    sendBtn.addEventListener('click', submitReply);
+    bodyInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitReply(); }
+    });
 
     document.body.appendChild(popup);
     activePopup = popup;

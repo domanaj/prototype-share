@@ -25,6 +25,15 @@ export interface Comment {
   author: string;
   color: string;
   createdAt: string;
+  replies?: Reply[];
+}
+
+export interface Reply {
+  id: string;
+  author: string;
+  color: string;
+  body: string;
+  createdAt: string;
 }
 
 // ─── Read helper for private blobs ───
@@ -142,4 +151,14 @@ export async function addComment(slug: string, comment: Comment): Promise<void> 
   const all = await readJson<Comment[]>(`${slug}/comments.json`) || [];
   all.push(comment);
   await writeJson(`${slug}/comments.json`, all);
+}
+
+export async function addReply(slug: string, commentId: string, reply: Reply): Promise<boolean> {
+  const all = await readJson<Comment[]>(`${slug}/comments.json`) || [];
+  const comment = all.find(c => c.id === commentId);
+  if (!comment) return false;
+  if (!comment.replies) comment.replies = [];
+  comment.replies.push(reply);
+  await writeJson(`${slug}/comments.json`, all);
+  return true;
 }
