@@ -735,12 +735,13 @@ export default function UploadPage() {
         }
 
         .ps-factory-link {
-          display: inline-block;
-          margin-top: 16px;
+          display: block;
+          margin-top: 20px;
           color: #333;
           font-size: 0.7rem;
           text-decoration: none;
           letter-spacing: 0.1em;
+          text-align: center;
           transition: color 0.2s ease;
         }
         .ps-factory-link:hover { color: #4ade80; }
