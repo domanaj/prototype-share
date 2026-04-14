@@ -9,10 +9,33 @@ interface Prototype {
   commentCount: number;
 }
 
+async function uploadNewVersion(slug: string, file: File): Promise<{ version: number; deduplicated?: boolean } | null> {
+  const html = await file.text();
+  if (!html.trim()) return null;
+
+  const encoder = new TextEncoder();
+  const data = encoder.encode(html);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+
+  const res = await fetch('/api/publish', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html, hash, slug }),
+  });
+
+  const body = await res.json();
+  if (!res.ok && res.status !== 409) return null;
+  return body;
+}
+
 export default function GalleryPage() {
   const [prototypes, setPrototypes] = useState<Prototype[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingSlug, setUpdatingSlug] = useState<string | null>(null);
+  const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/gallery')
@@ -70,27 +93,62 @@ export default function GalleryPage() {
         ) : (
           <div className="gal-grid">
             {prototypes.map((p, i) => (
-              <a
+              <div
                 key={p.slug}
-                href={`/p/${p.slug}`}
-                className="gal-card"
+                className={`gal-card ${updatingSlug === p.slug ? 'gal-card-updating' : ''} ${updateSuccess === p.slug ? 'gal-card-success' : ''}`}
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                {/* Preview iframe */}
-                <div className="gal-preview">
-                  <iframe
-                    src={`/p/${p.slug}?bare=1`}
-                    title={p.slug}
-                    sandbox="allow-same-origin"
-                    scrolling="no"
-                    tabIndex={-1}
-                  />
-                  <div className="gal-preview-overlay" />
-                </div>
+                {/* Preview - clickable to open */}
+                <a href={`/p/${p.slug}`} className="gal-preview-link">
+                  <div className="gal-preview">
+                    <iframe
+                      src={`/p/${p.slug}?bare=1`}
+                      title={p.slug}
+                      sandbox="allow-same-origin"
+                      scrolling="no"
+                      tabIndex={-1}
+                    />
+                    <div className="gal-preview-overlay" />
+                  </div>
+                </a>
 
                 {/* Card info */}
                 <div className="gal-card-info">
-                  <div className="gal-card-name">{p.slug}</div>
+                  <div className="gal-card-top-row">
+                    <a href={`/p/${p.slug}`} className="gal-card-name">{p.slug}</a>
+                    {/* Update button */}
+                    <label className="gal-update-btn" title="Upload a new version">
+                      <input
+                        type="file"
+                        accept=".html,.htm"
+                        style={{ display: 'none' }}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setUpdatingSlug(p.slug);
+                          setUpdateSuccess(null);
+                          const result = await uploadNewVersion(p.slug, file);
+                          setUpdatingSlug(null);
+                          if (result) {
+                            setUpdateSuccess(p.slug);
+                            setTimeout(() => setUpdateSuccess(null), 2000);
+                            // Refresh the list
+                            const res = await fetch('/api/gallery');
+                            const data = await res.json();
+                            if (Array.isArray(data)) setPrototypes(data);
+                          }
+                          e.target.value = '';
+                        }}
+                      />
+                      {updatingSlug === p.slug ? (
+                        <span className="gal-update-icon">⏳</span>
+                      ) : updateSuccess === p.slug ? (
+                        <span className="gal-update-icon gal-update-success">✓</span>
+                      ) : (
+                        <span className="gal-update-icon">↑</span>
+                      )}
+                    </label>
+                  </div>
                   <div className="gal-card-meta">
                     <span className="gal-badge gal-badge-version">v{p.latestVersion}</span>
                     {p.commentCount > 0 && (
@@ -101,7 +159,7 @@ export default function GalleryPage() {
                     <span className="gal-card-time">{timeAgo(p.createdAt)}</span>
                   </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         )}
@@ -193,7 +251,6 @@ export default function GalleryPage() {
           border: 1px solid #222;
           border-radius: 12px;
           overflow: hidden;
-          text-decoration: none;
           color: inherit;
           transition: all 0.2s ease;
           animation: gal-fade-in 0.4s ease forwards;
@@ -203,6 +260,19 @@ export default function GalleryPage() {
           border-color: #4ade80;
           box-shadow: 0 0 24px rgba(74, 222, 128, 0.1);
           transform: translateY(-2px);
+        }
+        .gal-card-updating {
+          border-color: #f97316 !important;
+          box-shadow: 0 0 24px rgba(249, 115, 22, 0.15) !important;
+        }
+        .gal-card-success {
+          border-color: #4ade80 !important;
+          box-shadow: 0 0 24px rgba(74, 222, 128, 0.2) !important;
+        }
+        .gal-preview-link {
+          display: block;
+          text-decoration: none;
+          color: inherit;
         }
 
         /* Preview */
@@ -230,12 +300,44 @@ export default function GalleryPage() {
         .gal-card-info {
           padding: 12px 16px 14px;
         }
+        .gal-card-top-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 6px;
+        }
         .gal-card-name {
           font-size: 0.85rem;
           font-weight: 600;
           color: #ccc;
-          margin-bottom: 6px;
+          text-decoration: none;
+          transition: color 0.15s ease;
         }
+        .gal-card-name:hover { color: #4ade80; }
+        .gal-update-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          border-radius: 6px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid #333;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+        .gal-update-btn:hover {
+          background: rgba(74, 222, 128, 0.1);
+          border-color: #4ade80;
+        }
+        .gal-update-icon {
+          font-size: 0.75rem;
+          color: #666;
+          transition: color 0.15s ease;
+        }
+        .gal-update-btn:hover .gal-update-icon { color: #4ade80; }
+        .gal-update-success { color: #4ade80 !important; }
         .gal-card-meta {
           display: flex;
           align-items: center;
