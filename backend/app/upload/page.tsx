@@ -265,7 +265,7 @@ export default function UploadPage() {
       ) : (
         /* Success state */
         <div className="ps-success-container">
-          <h1 className="ps-title" style={{ color: '#4ade80' }}>CONSUMED</h1>
+          <h1 className="ps-title" style={{ color: '#8B5CF6' }}>CONSUMED</h1>
           <p className="ps-subtitle">
             {result.deduplicated ? 'ALREADY IN MY BELLY' : `VERSION ${result.version} DIGESTED`}
           </p>
@@ -298,7 +298,7 @@ export default function UploadPage() {
                 <div className="ps-side-light ps-light-green ps-light-delay" />
               </div>
               <div className="ps-mouth ps-mouth-smile">
-                <div className="ps-mouth-text" style={{ color: '#4ade80' }}>YUM</div>
+                <div className="ps-mouth-text" style={{ color: '#8B5CF6' }}>YUM</div>
               </div>
               <div className="ps-chin"><div className="ps-chin-slot" /></div>
             </div>
@@ -365,10 +365,10 @@ export default function UploadPage() {
         .ps-title {
           font-size: 2.2rem;
           font-weight: 700;
-          color: #4ade80;
+          color: #8B5CF6;
           letter-spacing: 0.15em;
           margin: 0 0 4px;
-          text-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+          text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
         }
 
         .ps-subtitle {
@@ -426,8 +426,8 @@ export default function UploadPage() {
         }
         .ps-antenna-light.ps-blink-fast { animation: ps-blink 0.4s ease-in-out infinite; }
         .ps-antenna-light.ps-antenna-green {
-          background: #4ade80;
-          box-shadow: 0 0 12px rgba(74, 222, 128, 0.8);
+          background: #8B5CF6;
+          box-shadow: 0 0 12px rgba(139, 92, 246, 0.8);
         }
 
         /* Screws */
@@ -475,8 +475,8 @@ export default function UploadPage() {
           border-color: #38bdf8;
         }
         .ps-eye-happy {
-          box-shadow: 0 0 12px rgba(74, 222, 128, 0.3);
-          border-color: #4ade80;
+          box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+          border-color: #8B5CF6;
         }
         .ps-eye-chomp {
           box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
@@ -489,7 +489,7 @@ export default function UploadPage() {
           border-radius: 2px;
           transition: background 0.2s ease;
         }
-        .ps-eye-happy .ps-pupil { background: #4ade80; }
+        .ps-eye-happy .ps-pupil { background: #8B5CF6; }
         .ps-eye-divider {
           color: #555;
           font-size: 1.2rem;
@@ -522,9 +522,9 @@ export default function UploadPage() {
         }
         .ps-side-light.ps-light-delay { animation-delay: 0.3s; }
         .ps-side-light.ps-light-green {
-          background: #4ade80;
+          background: #8B5CF6;
           opacity: 1;
-          box-shadow: 0 0 10px rgba(74, 222, 128, 0.8);
+          box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
           animation: ps-pulse-light 1s ease-in-out infinite;
         }
 
@@ -540,16 +540,16 @@ export default function UploadPage() {
           overflow: hidden;
         }
         .ps-mouth-open {
-          border-color: #4ade80;
-          box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
+          border-color: #8B5CF6;
+          box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
           padding: 28px 20px;
         }
         .ps-mouth-chewing {
           animation: ps-chew-mouth 0.3s ease infinite;
         }
         .ps-mouth-smile {
-          border-color: #4ade80;
-          box-shadow: 0 0 12px rgba(74, 222, 128, 0.15);
+          border-color: #8B5CF6;
+          box-shadow: 0 0 12px rgba(139, 92, 246, 0.15);
           border-radius: 8px 8px 20px 20px;
         }
         .ps-mouth-text {
@@ -559,7 +559,7 @@ export default function UploadPage() {
           letter-spacing: 0.15em;
           transition: color 0.2s ease;
         }
-        .ps-mouth-ready { color: #4ade80 !important; text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
+        .ps-mouth-ready { color: #8B5CF6 !important; text-shadow: 0 0 10px rgba(139, 92, 246, 0.4); }
         .ps-mouth-subtext {
           font-size: 0.65rem;
           color: #444;
@@ -607,11 +607,11 @@ export default function UploadPage() {
           transition: opacity 0.4s ease;
           pointer-events: none;
           z-index: -1;
-          box-shadow: 0 0 40px rgba(74, 222, 128, 0.15), 0 0 80px rgba(74, 222, 128, 0.08);
+          box-shadow: 0 0 40px rgba(139, 92, 246, 0.15), 0 0 80px rgba(139, 92, 246, 0.08);
         }
         .ps-robot:hover .ps-glow { opacity: 0.6; }
-        .ps-robot-excited .ps-glow { opacity: 1 !important; box-shadow: 0 0 60px rgba(74, 222, 128, 0.3), 0 0 120px rgba(74, 222, 128, 0.15); }
-        .ps-glow-green { opacity: 0.8 !important; box-shadow: 0 0 60px rgba(74, 222, 128, 0.25), 0 0 120px rgba(74, 222, 128, 0.1); }
+        .ps-robot-excited .ps-glow { opacity: 1 !important; box-shadow: 0 0 60px rgba(139, 92, 246, 0.3), 0 0 120px rgba(139, 92, 246, 0.15); }
+        .ps-glow-green { opacity: 0.8 !important; box-shadow: 0 0 60px rgba(139, 92, 246, 0.25), 0 0 120px rgba(139, 92, 246, 0.1); }
 
         /* ─── Text elements ─── */
         .ps-instructions {
@@ -657,11 +657,11 @@ export default function UploadPage() {
           cursor: pointer;
           transition: border-color 0.15s ease;
         }
-        .ps-url-box:hover { border-color: #4ade80; }
+        .ps-url-box:hover { border-color: #8B5CF6; }
         .ps-url-text {
           flex: 1;
           font-size: 0.8rem;
-          color: #4ade80;
+          color: #8B5CF6;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -675,7 +675,7 @@ export default function UploadPage() {
           white-space: nowrap;
           transition: color 0.15s ease;
         }
-        .ps-copy-btn.ps-copied { color: #4ade80; }
+        .ps-copy-btn.ps-copied { color: #8B5CF6; }
 
         .ps-action-buttons {
           display: flex;
@@ -699,11 +699,11 @@ export default function UploadPage() {
           letter-spacing: 0.05em;
         }
         .ps-btn-primary {
-          background: #4ade80;
+          background: #8B5CF6;
           color: #0a0a0a;
           border: none;
         }
-        .ps-btn-primary:hover { background: #22c55e; box-shadow: 0 0 20px rgba(74, 222, 128, 0.3); }
+        .ps-btn-primary:hover { background: #7C3AED; box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
         .ps-btn-secondary {
           background: transparent;
           color: #666;
@@ -744,7 +744,7 @@ export default function UploadPage() {
           text-align: center;
           transition: color 0.2s ease;
         }
-        .ps-factory-link:hover { color: #4ade80; }
+        .ps-factory-link:hover { color: #8B5CF6; }
 
         @media (prefers-reduced-motion: reduce) {
           .ps-robot, .ps-robot-chewing, .ps-robot-happy,

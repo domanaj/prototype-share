@@ -23,7 +23,7 @@ export default function Home() {
             style={{
               display: 'block',
               padding: '14px 24px',
-              background: '#6366f1',
+              background: '#8B5CF6',
               color: '#fff',
               borderRadius: 10,
               fontSize: '1rem',

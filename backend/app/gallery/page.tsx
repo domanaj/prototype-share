@@ -117,7 +117,7 @@ export default function GalleryPage() {
                   <div className="gal-card-top-row">
                     <a href={`/p/${p.slug}`} className="gal-card-name">{p.slug}</a>
                     {/* Update button */}
-                    <label className="gal-update-btn" title="Upload a new version">
+                    <label className="gal-update-btn" title={`Upload v${p.latestVersion + 1} of this prototype`}>
                       <input
                         type="file"
                         accept=".html,.htm"
@@ -140,6 +140,7 @@ export default function GalleryPage() {
                           e.target.value = '';
                         }}
                       />
+                      <span className="gal-update-tooltip">Upload v{p.latestVersion + 1}</span>
                       {updatingSlug === p.slug ? (
                         <span className="gal-update-icon">⏳</span>
                       ) : updateSuccess === p.slug ? (
@@ -205,10 +206,10 @@ export default function GalleryPage() {
         .gal-title {
           font-size: 1.6rem;
           font-weight: 700;
-          color: #4ade80;
+          color: #8B5CF6;
           letter-spacing: 0.12em;
           margin: 0;
-          text-shadow: 0 0 20px rgba(74, 222, 128, 0.25);
+          text-shadow: 0 0 20px rgba(139, 92, 246, 0.25);
         }
         .gal-subtitle {
           font-size: 0.7rem;
@@ -221,10 +222,10 @@ export default function GalleryPage() {
           align-items: center;
           gap: 8px;
           padding: 10px 20px;
-          background: rgba(74, 222, 128, 0.1);
-          border: 1px solid rgba(74, 222, 128, 0.25);
+          background: rgba(139, 92, 246, 0.1);
+          border: 1px solid rgba(139, 92, 246, 0.25);
           border-radius: 8px;
-          color: #4ade80;
+          color: #8B5CF6;
           font-size: 0.8rem;
           font-weight: 600;
           font-family: inherit;
@@ -233,9 +234,9 @@ export default function GalleryPage() {
           transition: all 0.2s ease;
         }
         .gal-upload-btn:hover {
-          background: rgba(74, 222, 128, 0.15);
-          border-color: #4ade80;
-          box-shadow: 0 0 20px rgba(74, 222, 128, 0.15);
+          background: rgba(139, 92, 246, 0.15);
+          border-color: #8B5CF6;
+          box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
         }
 
         /* Grid */
@@ -257,8 +258,8 @@ export default function GalleryPage() {
           opacity: 0;
         }
         .gal-card:hover {
-          border-color: #4ade80;
-          box-shadow: 0 0 24px rgba(74, 222, 128, 0.1);
+          border-color: #8B5CF6;
+          box-shadow: 0 0 24px rgba(139, 92, 246, 0.1);
           transform: translateY(-2px);
         }
         .gal-card-updating {
@@ -266,8 +267,8 @@ export default function GalleryPage() {
           box-shadow: 0 0 24px rgba(249, 115, 22, 0.15) !important;
         }
         .gal-card-success {
-          border-color: #4ade80 !important;
-          box-shadow: 0 0 24px rgba(74, 222, 128, 0.2) !important;
+          border-color: #8B5CF6 !important;
+          box-shadow: 0 0 24px rgba(139, 92, 246, 0.2) !important;
         }
         .gal-preview-link {
           display: block;
@@ -313,8 +314,9 @@ export default function GalleryPage() {
           text-decoration: none;
           transition: color 0.15s ease;
         }
-        .gal-card-name:hover { color: #4ade80; }
+        .gal-card-name:hover { color: #8B5CF6; }
         .gal-update-btn {
+          position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -328,16 +330,34 @@ export default function GalleryPage() {
           flex-shrink: 0;
         }
         .gal-update-btn:hover {
-          background: rgba(74, 222, 128, 0.1);
-          border-color: #4ade80;
+          background: rgba(139, 92, 246, 0.1);
+          border-color: #8B5CF6;
         }
         .gal-update-icon {
           font-size: 0.75rem;
           color: #666;
           transition: color 0.15s ease;
         }
-        .gal-update-btn:hover .gal-update-icon { color: #4ade80; }
-        .gal-update-success { color: #4ade80 !important; }
+        .gal-update-btn:hover .gal-update-icon { color: #8B5CF6; }
+        .gal-update-btn:hover .gal-update-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .gal-update-tooltip {
+          position: absolute;
+          bottom: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%) translateY(4px);
+          background: #1a1a1a;
+          border: 1px solid #333;
+          border-radius: 6px;
+          padding: 4px 10px;
+          font-size: 0.65rem;
+          color: #ccc;
+          white-space: nowrap;
+          pointer-events: none;
+          opacity: 0;
+          transition: all 0.15s ease;
+          z-index: 10;
+        }
+        .gal-update-success { color: #8B5CF6 !important; }
         .gal-card-meta {
           display: flex;
           align-items: center;
@@ -375,7 +395,7 @@ export default function GalleryPage() {
           width: 32px;
           height: 32px;
           border: 3px solid #222;
-          border-top-color: #4ade80;
+          border-top-color: #8B5CF6;
           border-radius: 50%;
           margin: 0 auto 16px;
           animation: gal-spin 0.8s linear infinite;
@@ -391,7 +411,7 @@ export default function GalleryPage() {
         .gal-empty-link {
           display: inline-block;
           margin-top: 12px;
-          color: #4ade80;
+          color: #8B5CF6;
           text-decoration: none;
           font-size: 0.85rem;
           font-weight: 600;
