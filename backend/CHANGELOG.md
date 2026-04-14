@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.14 — 2026-04-14
+- Fix reply error — Vercel Blob overwrite flag missing on comments.json and meta.json updates
+
 ## v0.13 — 2026-04-14
 - Changelog page — `/changes` shows all releases, version counter in subtitle links to it
 - Version ticks up with every deploy

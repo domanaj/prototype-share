@@ -166,7 +166,7 @@ export default function UploadPage() {
       {!result ? (
         <div className="ps-upload-container">
           <h1 className="ps-title">HTML REVIEWER</h1>
-          <p className="ps-subtitle">DESIGN FEEDBACK MACHINE <a href="/changes" className="ps-version-link">v0.13</a></p>
+          <p className="ps-subtitle">DESIGN FEEDBACK MACHINE <a href="/changes" className="ps-version-link">v0.14</a></p>
 
           {/* Robot */}
           <div

@@ -74,6 +74,7 @@ async function writeJson(path: string, data: unknown): Promise<void> {
     access: 'private',
     contentType: 'application/json',
     addRandomSuffix: false,
+    allowOverwrite: true,
   });
 }
 
