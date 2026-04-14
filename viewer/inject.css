@@ -1,0 +1,469 @@
+/* Prototype Share Viewer Chrome */
+/* All styles prefixed with .ps- to avoid conflicts with user HTML */
+
+@keyframes ps-slide-down {
+  from { transform: translateY(-100%); opacity: 0; }
+  60% { transform: translateY(4px); }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes ps-slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  60% { transform: translateX(-8px); }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes ps-pin-drop {
+  0% { transform: scale(0) translateY(-20px); opacity: 0; }
+  50% { transform: scale(1.3) translateY(0); opacity: 1; }
+  70% { transform: scale(0.9); }
+  85% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes ps-ripple {
+  from { transform: scale(0.5); opacity: 0.6; }
+  to { transform: scale(3); opacity: 0; }
+}
+
+@keyframes ps-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes ps-float-away {
+  from { transform: scale(1) translateY(0); opacity: 0.6; }
+  to { transform: scale(0.5) translateY(-30px); opacity: 0; }
+}
+
+@keyframes ps-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ps-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes ps-flip {
+  0% { transform: rotateX(90deg); opacity: 0; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+}
+
+@keyframes ps-typewriter-cursor {
+  0%, 100% { border-right-color: transparent; }
+  50% { border-right-color: #666; }
+}
+
+/* Top bar */
+.ps-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: rgba(15, 15, 15, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 2147483646;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  color: #e0e0e0;
+  animation: ps-slide-down 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ps-topbar * {
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.ps-logo {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.ps-version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  font-size: 12px;
+  font-weight: 600;
+  perspective: 200px;
+}
+
+.ps-version-num {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.ps-version-num.ps-flipping {
+  animation: ps-flip 0.4s ease forwards;
+}
+
+/* Version dropdown */
+.ps-version-select {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 12px;
+  padding: 3px 24px 3px 8px;
+  cursor: pointer;
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  transition: border-color 0.15s ease;
+}
+
+.ps-version-select:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Comment count */
+.ps-comment-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #999;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ps-comment-count:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e0e0e0;
+}
+
+.ps-comment-count-num {
+  display: inline-block;
+  min-width: 1ch;
+  text-align: center;
+}
+
+/* Hint text */
+.ps-hint {
+  margin-left: auto;
+  color: #666;
+  font-size: 11px;
+  transition: opacity 0.3s ease;
+}
+
+.ps-hint kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  color: #888;
+}
+
+/* Shimmer effect on first comment */
+.ps-topbar.ps-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(15, 15, 15, 0.92) 0%,
+    rgba(99, 102, 241, 0.15) 50%,
+    rgba(15, 15, 15, 0.92) 100%
+  );
+  background-size: 200% 100%;
+  animation: ps-shimmer 1s ease forwards;
+}
+
+/* Comment pins */
+.ps-pin {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2147483645;
+  animation: ps-pin-drop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  pointer-events: auto;
+}
+
+.ps-pin:hover {
+  transform: rotate(-45deg) scale(1.12) translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.ps-pin-number {
+  transform: rotate(45deg);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  font-family: -apple-system, system-ui, sans-serif;
+}
+
+.ps-pin.ps-active {
+  animation: ps-breathe 2s ease-in-out infinite;
+}
+
+.ps-pin.ps-outdated {
+  opacity: 0.35;
+  filter: grayscale(0.5);
+  animation: none;
+}
+
+.ps-pin.ps-removing {
+  animation: ps-float-away 0.35s ease forwards;
+}
+
+/* Pin ripple on drop */
+.ps-pin-ripple {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid;
+  pointer-events: none;
+  z-index: 2147483644;
+  animation: ps-ripple 0.5s ease-out forwards;
+}
+
+/* Comment popup */
+.ps-comment-popup {
+  position: absolute;
+  width: 280px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 2147483647;
+  font-family: -apple-system, system-ui, sans-serif;
+  overflow: hidden;
+  animation: ps-fade-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.ps-comment-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ps-comment-author-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ps-comment-author-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.ps-comment-time {
+  font-size: 11px;
+  color: #666;
+  margin-left: auto;
+}
+
+.ps-comment-body {
+  padding: 8px 12px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ccc;
+}
+
+/* New comment input */
+.ps-comment-input-wrap {
+  padding: 12px;
+}
+
+.ps-comment-input {
+  width: 100%;
+  min-height: 60px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 8px 10px;
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.ps-comment-input:focus {
+  border-color: #6366f1;
+}
+
+.ps-comment-input::placeholder {
+  color: #555;
+}
+
+.ps-comment-submit {
+  margin-top: 8px;
+  width: 100%;
+  padding: 6px 12px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+  font-family: inherit;
+}
+
+.ps-comment-submit:hover {
+  background: #5558e6;
+}
+
+.ps-comment-submit:active {
+  transform: scale(0.97);
+}
+
+/* Sidebar */
+.ps-sidebar {
+  position: fixed;
+  top: 40px;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(12px);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 2147483645;
+  overflow-y: auto;
+  animation: ps-slide-in-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  font-family: -apple-system, system-ui, sans-serif;
+}
+
+.ps-sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ps-sidebar-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.ps-sidebar-close {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ps-sidebar-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e0e0e0;
+}
+
+.ps-sidebar-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  animation: ps-fade-in 0.3s ease forwards;
+}
+
+.ps-sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ps-sidebar-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ps-sidebar-item-body {
+  font-size: 13px;
+  color: #999;
+  line-height: 1.4;
+  padding-left: 16px;
+}
+
+.ps-sidebar-item.ps-outdated {
+  opacity: 0.5;
+}
+
+.ps-sidebar-item .ps-outdated-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+/* Empty state */
+.ps-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  color: #666;
+}
+
+.ps-empty-text {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ps-topbar,
+  .ps-pin,
+  .ps-pin-ripple,
+  .ps-comment-popup,
+  .ps-sidebar,
+  .ps-sidebar-item,
+  .ps-version-num.ps-flipping {
+    animation: none !important;
+    transition: none !important;
+  }
+  .ps-pin.ps-active {
+    animation: none !important;
+  }
+}
