@@ -14,10 +14,17 @@ export default function UploadPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chewIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    const count = parseInt(localStorage.getItem('ps-files-consumed') || '0');
-    setFilesConsumed(count);
+  const fetchGlobalCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/stats');
+      const data = await res.json();
+      setFilesConsumed(data.totalVersions || 0);
+    } catch { /* ignore */ }
   }, []);
+
+  useEffect(() => {
+    fetchGlobalCount();
+  }, [fetchGlobalCount]);
 
   // Chomping animation: cycle through frames while chewing
   useEffect(() => {
@@ -98,9 +105,8 @@ export default function UploadPage() {
       // Keep chomping for at least 1.5s so the animation is visible
       await new Promise(r => setTimeout(r, 1500));
 
-      const newCount = filesConsumed + 1;
-      setFilesConsumed(newCount);
-      localStorage.setItem('ps-files-consumed', String(newCount));
+      // Refresh global count
+      await fetchGlobalCount();
       setResult(body);
     } catch (err: any) {
       setError(err.message || 'Upload failed. Robot sad.');
@@ -108,7 +114,7 @@ export default function UploadPage() {
       setIsUploading(false);
       setIsChewing(false);
     }
-  }, [filesConsumed]);
+  }, [fetchGlobalCount]);
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
