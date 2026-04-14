@@ -166,7 +166,7 @@ export default function UploadPage() {
       {!result ? (
         <div className="ps-upload-container">
           <h1 className="ps-title">HTML REVIEWER</h1>
-          <p className="ps-subtitle">DESIGN FEEDBACK MACHINE v0.1</p>
+          <p className="ps-subtitle">DESIGN FEEDBACK MACHINE <a href="/changes" className="ps-version-link">v0.13</a></p>
 
           {/* Robot */}
           <div
@@ -738,6 +738,17 @@ export default function UploadPage() {
           0%, 100% { transform: rotate(0deg); }
           25% { transform: rotate(-1deg); }
           75% { transform: rotate(1deg); }
+        }
+
+        .ps-version-link {
+          color: #555;
+          text-decoration: none;
+          border-bottom: 1px dashed #333;
+          transition: color 0.15s ease, border-color 0.15s ease;
+        }
+        .ps-version-link:hover {
+          color: #8B5CF6;
+          border-color: #8B5CF6;
         }
 
         .ps-factory-link {
