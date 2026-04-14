@@ -1,9 +1,0 @@
-{
-  "/_not-found/page": "/_not-found",
-  "/p/[slug]/route": "/p/[slug]",
-  "/api/versions/[slug]/route": "/api/versions/[slug]",
-  "/api/comments/route": "/api/comments",
-  "/api/publish/route": "/api/publish",
-  "/p/[slug]/v/[version]/route": "/p/[slug]/v/[version]",
-  "/page": "/"
-}
