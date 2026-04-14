@@ -46,7 +46,7 @@ export default function GalleryPage() {
         <div className="gal-header">
           <div className="gal-header-left">
             <h1 className="gal-title">HTML ROBOT FACTORY</h1>
-            <p className="gal-subtitle">ALL PROTOTYPES CONSUMED BY THE ROBOT</p>
+            <p className="gal-subtitle">ALL PROTOTYPES CONSUMED BY THE ROBOT. YUM!</p>
           </div>
           <a href="/upload" className="gal-upload-btn">
             <span className="gal-upload-icon">🤖</span> Feed the robot
