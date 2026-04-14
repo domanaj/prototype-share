@@ -1,0 +1,9 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/p/[slug]/route": "app/p/[slug]/route.js",
+  "/api/versions/[slug]/route": "app/api/versions/[slug]/route.js",
+  "/api/comments/route": "app/api/comments/route.js",
+  "/api/publish/route": "app/api/publish/route.js",
+  "/p/[slug]/v/[version]/route": "app/p/[slug]/v/[version]/route.js",
+  "/page": "app/page.js"
+}

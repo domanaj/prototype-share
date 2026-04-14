@@ -1,5 +1,3 @@
-import { db, schema } from '@/db';
-import { eq, and } from 'drizzle-orm';
 import { servePrototype } from '@/lib/serve';
 
 export async function GET(
