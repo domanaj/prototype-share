@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.15 — 2026-04-14
+- Fix empty gallery — rewrote gallery API to use shared store helpers
+- Include reply counts in gallery comment badge
+
 ## v0.14 — 2026-04-14
 - Fix reply error — Vercel Blob overwrite flag missing on comments.json and meta.json updates
 
